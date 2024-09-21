@@ -1,0 +1,33 @@
+.login-section {
+    background: #d0e7ff;
+
+    .card-wrap {
+        height: calc(100vh - 60px);
+        display: flex;
+        align-items: center;
+
+        .card {
+            padding: 15px 30px;
+            background: #007bff;
+
+            .form-item {
+                &:not(:last-child) {
+                    margin-bottom: 10px;
+                }
+
+                label {
+                    font-weight: 600;
+                    font-size: 18px;
+                    min-width: 100px;
+                    margin-right: 5px;
+                }
+
+                input {}
+
+                .btn-wrap {
+                    width: fit-content;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,27 @@
+<section class="common-section login-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-8 col-md-6 col-lg-4 mx-auto">
+                <div class="card-wrap">
+                    <div class="card">
+                        <form [formGroup]="loginForm">
+                            <div class="form-item">
+                                <label for="username">User Name :</label>
+                                <input type="text" name="username" formControlName="userName">
+                            </div>
+                            <div class="form-item">
+                                <label for="pwd">Password :</label>
+                                <input type="password" name="pwd" formControlName="password">
+                            </div>
+                            <div class="form-item">
+                                <div class="btn-wrap mx-auto">
+                                    <button class="btn btn-success" (click)="onClickSubmit()">Login</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

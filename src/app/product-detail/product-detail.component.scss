@@ -1,0 +1,36 @@
+.product-top-section {
+    .form-item {
+        margin-bottom: 10px;
+
+        label {
+            font-size: 16px;
+            font-weight: 600;
+            width: 80px;
+            margin-right: 5px;
+        }
+    }
+
+    .table-wrap {
+        margin-bottom: 15px;
+
+        table {
+            border: 1px solid black;
+            border-collapse: collapse;
+
+            th,
+            td {
+                border: 1px solid black;
+                padding: 3px 5px;
+                border-collapse: collapse;
+            }
+        }
+    }
+
+    .diff {
+        .form-item {
+            label {
+                width: 126px;
+            }
+        }
+    }
+}

@@ -1,0 +1,204 @@
+<section class="common-section product-top-section">
+    <div class="container">
+        <form [formGroup]="productForm">
+            <div class="row">
+                <div class="co-12 col-md-6">
+                    <div class="form-item">
+                        <h4 class="name"><span>User Name : </span> {{userName}} </h4>
+                    </div>
+                    <div class="form-item">
+                        <label for="name">Name</label>
+                        <input type="text" placeholder="Name" name="name" formControlName="name">
+                        <div class="in-valid" *ngIf="submitted && productForm.controls['name']?.errors">
+                            <small class="text-danger"
+                                *ngIf="submitted && productForm.controls['name']?.errors?.['required']">Name is
+                                required</small>
+                            <small class="text-danger"
+                                *ngIf="submitted && productForm.controls['name']?.errors?.['minlength']">Name can't bee
+                                less 3 character</small>
+                            <small class="text-danger"
+                                *ngIf="submitted && productForm.controls['name']?.errors?.['maxlength']">Name can't bee
+                                greater 40 character</small>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label for="mob">Mobile No.</label>
+                        <input type="text" placeholder="Mobile No." name="mob" formControlName="mob">
+                        <div class="in-valid" *ngIf="submitted && productForm.controls['mob']?.errors">
+                            <small class="text-danger"
+                                *ngIf="submitted && productForm.controls['mob']?.errors?.['required']">Mobile No. is
+                                required</small>
+                            <small class="text-danger"
+                                *ngIf="submitted && productForm.controls['mob']?.errors?.['minlength']">Mobile No.
+                                can't bee
+                                less than 6 digit</small>
+                            <small class="text-danger"
+                                *ngIf="submitted && productForm.controls['mob']?.errors?.['maxlength']">Mobile No.
+                                can't bee
+                                More than 10 digit</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="co-12 col-md-6">
+                    <div class="form-item">
+                        <div class="btn-wrap d-flex justify-content-end">
+                            <button class="btn btn-danger" (click)="onClickLogOut()">LogOut</button>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <div class="form-item">
+                            <label for="date">Date</label>
+                            <input type="date" name="date" formControlName="date" [max]="getToday()">
+                            <div class="in-valid" *ngIf="submitted && productForm.controls['date']?.errors">
+                                <small class="text-danger"
+                                    *ngIf="submitted && productForm.controls['date']?.errors?.['required']">Date is
+                                    required</small>
+                                <small class="text-danger"
+                                    *ngIf="submitted && productForm.controls['email']?.errors?.['email']">Invalid date
+                                    can't be greater than today date</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <div class="form-item">
+                            <label for="email">Email ID</label>
+                            <input type="email" placeholder="Email ID" name="email" formControlName="email">
+                            <div class="in-valid" *ngIf="submitted && productForm.controls['email']?.errors">
+                                <small class="text-danger"
+                                    *ngIf="submitted && productForm.controls['email']?.errors?.['required']">Email ID is
+                                    required</small>
+                                <small class="text-danger"
+                                    *ngIf="submitted && productForm.controls['email']?.errors?.['email']">Invalid Email
+                                    ID</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-wrap">
+                        <table>
+                            <tr>
+                                <th>Action</th>
+                                <th>Id</th>
+                                <th>Code</th>
+                                <th>Rate</th>
+                                <th>Quantity</th>
+                                <th>Value</th>
+                            </tr>
+                            <ng-container formArrayName="products">
+                                <ng-container *ngFor="let product of products.controls; let i = index">
+                                    <tr [formGroupName]="i">
+                                        <td>
+                                            <button class="btn btn-danger" (click)="deleteProduct(i)"
+                                                [disabled]="products.controls.length === 1">
+                                                <span class="icon">
+                                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                                </span>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <input type="text" placeholder="Enter ID" formControlName="productId"
+                                                (blur)="onAddedProductId(i)">
+                                            <div class="in-valid"
+                                                *ngIf="submitted && products.controls[i].controls['productId']?.errors">
+                                                <small class="text-danger"
+                                                    *ngIf="submitted && products.controls[i].controls['productId']?.errors?.['required']">
+                                                    Product Id is required
+                                                </small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="text" placeholder="Code" formControlName="code" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="text" placeholder="Enter Rate" formControlName="rate"
+                                                (blur)="onAddedquantity(i)">
+                                            <div class="in-valid"
+                                                *ngIf="submitted && products.controls[i].controls['rate']?.errors">
+                                                <small class="text-danger"
+                                                    *ngIf="submitted && products.controls[i].controls['rate']?.errors?.['required']">
+                                                    Rate value is required</small>
+                                                <small class="text-danger"
+                                                    *ngIf="submitted && products.controls[i].controls['rate']?.errors?.['min']">
+                                                    Invalid value rate can't be 0</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="text" placeholder="Enter Quantity" formControlName="quantity"
+                                                (blur)="onAddedquantity(i)">
+                                            <div class="in-valid"
+                                                *ngIf="submitted && products.controls[i].controls['quantity']?.errors">
+                                                <small class="text-danger"
+                                                    *ngIf="submitted && products.controls[i].controls['quantity']?.errors?.['required']">
+                                                    Quantity value is required</small>
+                                                <small class="text-danger"
+                                                    *ngIf="submitted && products.controls[i].controls['quantity']?.errors?.['min']">
+                                                    Invalid value quantity can't be 0</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="text" placeholder="Value" formControlName="allValue" readonly>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </ng-container>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <div class="btn-wrap">
+                        <button class="btn btn-success" (click)="addProduct()">
+                            <span class="icon">
+                                <i class="fa fa-plus" aria-hidden="true"></i>
+                            </span> Add New
+                        </button>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 diff">
+                    <div class="form-item">
+                        <label for="totalQuntity">Total Quantity :</label>
+                        <input type="text" name="totalQuntity" formControlName="totalQuantity" readonly>
+                    </div>
+                    <div class="form-item">
+                        <label for="totalVale">Total Value :</label>
+                        <input type="text" name="totalVale" formControlName="totalValue" readonly>
+                    </div>
+                    <div class="form-item">
+                        <label for="discount">Discount :</label>
+                        <input type="text" name="discount" formControlName="discount" (blur)="onAddedDiscount()">
+                    </div>
+                    <div class="form-item">
+                        <label for="invoiceAmt">Invoice Amount :</label>
+                        <input type="text" name="invoiceAmt" formControlName="invoiceAmt" readonly>
+                        <div class="in-valid" *ngIf="submitted && productForm.controls['invoiceAmt']?.errors">
+                            <small class="text-danger"
+                                *ngIf="submitted && productForm.controls['invoiceAmt']?.errors?.['max']">
+                                Discount amount can't be equal or greater than total amount
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <div class="col-12 col-md-6 mx-auto">
+                <div class="btn-wrap"><button class="btn btn-success" (click)="onClickSubmit()">Submit</button></div>
+            </div>
+            <div class="col-12 col-md-6 mx-auto">
+                <div class="btn-wrap d-flex justify-content-end"><button class="btn btn-danger"
+                        (click)="onClickClear()">Cancel</button></div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-10 mx-auto">
+                <div class="json">
+                    {{sendData| json}}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
