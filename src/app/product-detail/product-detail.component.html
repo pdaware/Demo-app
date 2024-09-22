@@ -170,13 +170,19 @@
                     <div class="form-item">
                         <label for="discount">Discount :</label>
                         <input type="text" name="discount" formControlName="discount" (blur)="onAddedDiscount()">
+                        <div class="in-valid" *ngIf="submitted && productForm.controls['discount']?.errors">
+                            <small class="text-danger"
+                                *ngIf="submitted && productForm.controls['discount']?.errors?.['max']">
+                                Discount amount can't be equal or greater than total amount
+                            </small>
+                        </div>
                     </div>
                     <div class="form-item">
                         <label for="invoiceAmt">Invoice Amount :</label>
                         <input type="text" name="invoiceAmt" formControlName="invoiceAmt" readonly>
                         <div class="in-valid" *ngIf="submitted && productForm.controls['invoiceAmt']?.errors">
                             <small class="text-danger"
-                                *ngIf="submitted && productForm.controls['invoiceAmt']?.errors?.['max']">
+                                *ngIf="submitted && productForm.controls['invoiceAmt']?.errors?.['min']">
                                 Discount amount can't be equal or greater than total amount
                             </small>
                         </div>

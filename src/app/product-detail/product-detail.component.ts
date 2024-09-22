@@ -69,7 +69,7 @@ export class ProductDetailComponent implements OnInit {
       totalQuantity: [''],
       totalValue: [''],
       discount: [''],
-      invoiceAmt: [''],
+      invoiceAmt: ['', [Validators.min(1)]],
       products: this.fb.array([])
     });
     this.addProduct();
@@ -99,15 +99,15 @@ export class ProductDetailComponent implements OnInit {
   }
 
   onAddedProductId(productIndex: number) {
-    for (let i = 0; i < this.productsArray.length; i++) {
-      if (this.products.controls[productIndex].controls['productId'].value === this.productsArray[i].id) {
-        this.products.controls[productIndex].controls['code'].setValue(this.productsArray[i].code);
-        break;
-      }
-      else {
-        this.products.controls[productIndex].controls['code'].setValue(null);
-        this.products.controls[productIndex].controls['productId'].setErrors({ required: true });
-      }
+
+    const productId = this.products.controls[productIndex].controls['productId'].value;
+    const product = this.productsArray.find(p => p.id === productId);
+
+    if (product) {
+      this.products.controls[productIndex].controls['code'].setValue(product.code);
+    } else {
+      this.products.controls[productIndex].controls['code'].setValue(null);
+      this.products.controls[productIndex].controls['productId'].setErrors({ required: true });
     }
   }
 
@@ -117,56 +117,53 @@ export class ProductDetailComponent implements OnInit {
   }
 
   onAddedquantity(productIndex: number) {
-    const rate: number = parseInt(this.products.controls[productIndex].controls['rate'].value);
-    const quantity: number = parseInt(this.products.controls[productIndex].controls['quantity'].value);
-    const value: number = rate * quantity;
-    let totalQuantity: number = quantity;
-    let totalValue: number = value;
-    let discount: number = 0;
-    let invoiceAmount: number = totalValue;
-    if (rate !== 0 && quantity !== 0) {
-      this.products.controls[productIndex].controls['allValue'].setValue(value);
-    } else {
-      this.products.controls[productIndex].controls['allValue'].setValue(null);
-    }
-    if (this.products.controls.length > 1) {
-      totalQuantity = 0
-      totalValue = 0
-      for (let i = 0; i < this.products.controls.length; i++) {
-        totalQuantity = totalQuantity + parseInt(this.products.controls[i].controls['quantity'].value);
-        totalValue = totalValue + parseInt(this.products.controls[i].controls['allValue'].value);
-        invoiceAmount = totalValue;
-      }
-      if (this.productForm.controls['discount'].value > 0) {
-        discount = this.products.controls[productIndex].controls['discount'].value;
-        invoiceAmount = totalValue - discount;
-      }
-    }
-    this.productForm.controls['totalQuantity'].setValue(totalQuantity);
-    this.productForm.controls['totalValue'].setValue(totalValue);
-    this.productForm.controls['invoiceAmt'].setValue(invoiceAmount);
-    this.productForm.controls['totalQuantity'].updateValueAndValidity();
-    this.productForm.controls['totalValue'].updateValueAndValidity();
+    const rate = this.products.controls[productIndex].controls['rate'].value || 0;
+    const quantity = this.products.controls[productIndex].controls['quantity'].value || 0;
+    const value = rate * quantity;
+    this.products.controls[productIndex].controls['allValue'].setValue(value || null);
+    this.updateTotals();
+  }
+
+
+  updateTotals() {
+    let totalQuantity = 0;
+    let totalValue = 0;
+    this.products.controls.forEach(control => {
+      totalQuantity += Number(control.get('quantity')?.value || 0);
+      totalValue += Number(control.get('allValue')?.value || 0);
+    });
+    const discount = Number(this.productForm.controls['discount'].value || 0);
+    const invoiceAmount = totalValue - discount;
+    this.productForm.patchValue({
+      totalQuantity,
+      totalValue,
+      invoiceAmt: Math.max(invoiceAmount, 0) 
+    });
+    this.productForm.controls['invoiceAmt'].setValidators([
+      Validators.required,
+      Validators.min(1)
+    ]);
     this.productForm.controls['invoiceAmt'].updateValueAndValidity();
   }
 
+
+
   onAddedDiscount() {
-    const discount = parseInt(this.productForm.controls['discount'].value);
-    const totalValue = parseInt(this.productForm.controls['totalValue'].value);
-    if (totalValue != discount && discount < totalValue) {
-      const invoiceAmount = totalValue - discount;
-      this.productForm.controls['invoiceAmt'].setValue(invoiceAmount);
+    const discount = Number(this.productForm.controls['discount'].value || 0);
+    const totalValue = Number(this.productForm.controls['totalValue'].value || 0);
+
+    if (discount > totalValue) {
+      this.productForm.controls['discount'].setErrors({ max: true });
     } else {
-      // this.productForm.controls['invoiceAmt'].setValue(0);
-      this.productForm.controls['invoiceAmt'].setValidators(Validators.max(totalValue - 1));
-      this.productForm.controls['invoiceAmt'].updateValueAndValidity();
+      const invoiceAmount = totalValue - discount;
+      this.productForm.controls['invoiceAmt'].setValue(Math.max(invoiceAmount, 0)); 
     }
   }
 
   onClickSubmit() {
     this.submitted = true;
     if (this.productForm.valid) {
-      let resObj: ResObj = {
+      const resObj: ResObj = {
         Name: this.productForm.controls['name'].value,
         Date: this.productForm.controls['date'].value,
         Mobile: this.productForm.controls['mob'].value,
@@ -175,18 +172,14 @@ export class ProductDetailComponent implements OnInit {
         TotalValue: this.productForm.controls['totalValue'].value,
         Discount: this.productForm.controls['discount'].value,
         InvoiceAmount: this.productForm.controls['invoiceAmt'].value,
-        Products: []
-      }
-      for (let i = 0; i < this.products.controls.length; i++) {
-        let obj: Product = {
-          Id: this.products.controls[i].controls['productId'].value,
-          Code: this.products.controls[i].controls['code'].value,
-          Rate: this.products.controls[i].controls['rate'].value,
-          Quantity: this.products.controls[i].controls['quantity'].value,
-          Value: this.products.controls[i].controls['allValue'].value,
-        }
-        resObj.Products.push(obj);
-      }
+        Products: this.products.controls.map(control => ({
+          Id: control.controls['productId'].value,
+          Code: control.controls['code'].value,
+          Rate: control.controls['rate'].value,
+          Quantity: control.controls['quantity'].value,
+          Value: control.controls['allValue'].value,
+        }))
+      };
       this.sendData = resObj;
     }
   }
